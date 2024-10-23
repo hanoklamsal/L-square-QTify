@@ -1,31 +1,40 @@
-import React from 'react'
-import MyCard from '../Card/MyCard'
-import styles from "./Section.module.css"
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState } from "react";
+import styles from "./Section.module.css";
+import Card from "../Card/Card";
+import { CircularProgress } from "@mui/material";
+import Carousel from "../Carousel/Carousel";
 
-function Section() {
-    const [cardData, setCardData] = useState([]);
+const Section = ({ title, data, type }) => {
+  const [carouselToggle, setCarouselToggle] = useState(true);
 
-    useEffect(() => {
-      async function fetchData() {
-        const response = await axios.get(
-          `https://qtify-backend-labs.crio.do/albums/top`
-        );
-        setCardData(response.data);
-        console.log(response.data);
-      }
-      fetchData();
-    }, []);
+  const handleToggle = () => {
+    setCarouselToggle(!carouselToggle);
+  };
   return (
     <div>
-<header className={styles.header}>
-<h4>Top Albums</h4>
-<button>Collapse</button>
-</header>
-        <MyCard cardData={cardData}/>
+      <div className={styles.header}>
+        <h3>{title}</h3>
+        <h4 className={styles.toggleText} onClick={handleToggle}>
+          {carouselToggle ? "Show All" : "Collapse All"}
+        </h4>
+      </div>
+      {data.length === 0 ? (
+        <CircularProgress />
+      ) : (
+        <div className={styles.cardWrapper}>
+          {!carouselToggle ? (
+            <div className={styles.wrapper}>
+                {data.map((card) => (
+                <Card data={card} type={type} key={card.id} />
+                ))}
+            </div>
+          ) : (
+            <Carousel data={data} renderCardComponent={(data) => <Card data={data} type={type}/>}/>
+          )}
+        </div>
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default Section
+export default Section;
